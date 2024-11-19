@@ -13,6 +13,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jpcap.JpcapCaptor;
+import jpcap.PacketReceiver;
+import jpcap.packet.Packet;
 
 public class PacketCaptureFX extends Application {
     TextArea captureInfo = new TextArea();
@@ -24,6 +26,15 @@ public class PacketCaptureFX extends Application {
     ConfigDialog configDialog;
     JpcapCaptor jpcapCaptor;
     Thread captureThread;
+
+    class PacketHandler implements PacketReceiver {
+
+        @Override
+        public void receivePacket(Packet packet) {
+            captureInfo.appendText(packet.toString() + "\n");
+        }
+    }
+
 
     private void interrupt(String threadName) {
         ThreadGroup currentGroup =
@@ -62,8 +73,13 @@ public class PacketCaptureFX extends Application {
             if (configDialog == null) {
                 configDialog = new ConfigDialog(stage);
                 configDialog.showAndWait();
+                jpcapCaptor = configDialog.getJpcapCaptor();
             }
-            jpcapCaptor = configDialog.getJpcapCaptor();
+
+        });
+
+        buttonStop.setOnAction(e -> {
+            interrupt("captureThread");
         });
 
         buttonStart.setOnAction(e -> {
@@ -71,12 +87,14 @@ public class PacketCaptureFX extends Application {
             if (jpcapCaptor == null) {
                 configDialog = new ConfigDialog(stage);
                 configDialog.showAndWait();
+                jpcapCaptor = configDialog.getJpcapCaptor();
             }
+
             //停止还没结束的抓包线程
             //开线程名为"captureThread"的新线程进行抓包
             captureThread =
             new Thread(() -> {
-                for (int i=0;i<10;i++){
+                while (true){
                     //如果声明了本线程被中断，则退出循环
                     if(Thread.currentThread().isInterrupted())
                         break;

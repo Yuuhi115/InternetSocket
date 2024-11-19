@@ -10,7 +10,7 @@ import jpcap.packet.TCPPacket;
 import java.io.IOException;
 
 public class Demo {
-    private PacketHandler packetHandler;
+    private PacketCaptureFX.PacketHandler packetHandler;
     public static void main(String[] args) throws IOException {
         NetworkInterface[] devices = JpcapCaptor.getDeviceList();
         for (int i = 0; i < devices.length; i++) {
