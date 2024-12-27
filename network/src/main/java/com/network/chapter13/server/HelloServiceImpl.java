@@ -1,6 +1,6 @@
 package com.network.chapter13.server;
 
-import com.network.rmi.HelloService;
+import rmi.HelloService;
 
 import java.rmi.RemoteException;
 import java.rmi.server.RMIClientSocketFactory;

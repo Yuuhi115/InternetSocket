@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 public class TCPThreadServer {
   private int port = 8008; //服务器监听端口 8
   private ServerSocket serverSocket;
+
   ExecutorService executorService = Executors.newFixedThreadPool(6);//定义服务器套接字 9
 
   public TCPThreadServer() throws IOException {

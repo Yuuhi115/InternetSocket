@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jpcap">
+    <CLASSES>
+      <root url="jar://E:/edge/Jpcap32_64/jpcap32位/jpcap.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

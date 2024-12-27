@@ -1,6 +1,6 @@
 package com.network.chapter13.client;
 
-import com.network.rmi.HelloService;
+import rmi.HelloService;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,6 +12,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import rmi.RmiKitService;
+import rmi.RmiMsgService;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -21,12 +23,16 @@ import java.util.ArrayList;
 public class HelloClientFX extends Application {
     private TextArea taDisplay = new TextArea();
     private TextField tfMessage = new TextField();
-    Button btnEcho = new Button("调用echo方法");
-    Button btnGetTime = new Button("调用getTime 方法");
+    private TextField tfNO = new TextField();
+    private TextField tfName = new TextField();
+    Button btnSendMsg = new Button("发送信息");
+    Button btnSendNoAndName = new Button("发送学号和姓名");
 
     Button btnListSort = new Button("调用sort方法");
     //客户端也有一份和服务端相同的远程接口 9
     private HelloService helloService;
+    private RmiKitService rmiKitService;
+    private RmiMsgService rmiMsgService;
 
     public static void main(String[] args) {
         launch(args);
@@ -43,7 +49,7 @@ public class HelloClientFX extends Application {
         hBox.setPadding(new Insets(10, 20, 10, 20));
         hBox.setAlignment(Pos.CENTER);
         hBox.getChildren().addAll(new Label("输入信息："),tfMessage,
-                btnEcho,btnGetTime, btnListSort);
+                btnSendMsg,new Label("学号："),tfNO,new Label("姓名"),tfName,btnSendNoAndName);
 
         vBoxMain.getChildren().addAll(new Label("信息显示区："),
                 taDisplay,hBox);
@@ -54,20 +60,22 @@ public class HelloClientFX extends Application {
         new Thread(()->{
             rmiInit();
         }).start();
-        btnEcho.setOnAction(event -> {
+        btnSendMsg.setOnAction(event -> {
             try {
                 String msg = tfMessage.getText();
-                taDisplay.appendText(helloService.echo(msg) + "\n");
+                taDisplay.appendText(rmiMsgService.send(msg) + "\n");
 
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
         });
 
-        btnGetTime.setOnAction(event -> {
+        btnSendNoAndName.setOnAction(event -> {
             try {
-                String msg = helloService.getTime().toString();
-                taDisplay.appendText(msg + "\n");
+                String Name = tfName.getText().trim();
+                String No = tfNO.getText().trim();
+                //System.out.println(rmiKitService.ipToLong("192.168.236.149"));
+                taDisplay.appendText(rmiMsgService.send(No,Name));
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -92,12 +100,14 @@ public class HelloClientFX extends Application {
     }
     public void rmiInit() {
         try {
-            Registry registry = LocateRegistry.getRegistry("192.168.201.51",1099);
+            Registry registry = LocateRegistry.getRegistry("202.116.195.71",1099);
             System.out.println("RMI远程服务别名列表：");
             for (String name: registry.list()) {
                 System.out.println(name);
             }
-            helloService = (HelloService) registry.lookup("HelloService");
+            /*helloService = (HelloService) registry.lookup("HelloService");
+            rmiKitService = (RmiKitService) registry.lookup("RmiKitService");*/
+            rmiMsgService = (RmiMsgService) registry.lookup("RmiMsgService");
         } catch (Exception e) {
             e.printStackTrace();
         }
